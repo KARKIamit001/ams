@@ -9,7 +9,7 @@ const app= express()
 //2middlewsare
 app.use(express.json())
 app.use(cors({
-    origin:"http://localhost:5173"
+    origin:["http://localhost:5173", "https://ams-khaki.vercel.app"]
     // origin : ["http://localhost:5173", "knatipur.com"]  if we add new one
 }))
 
