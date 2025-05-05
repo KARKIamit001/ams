@@ -5,8 +5,6 @@ import toast from "react-hot-toast";
 export default function AttendanceCard() {
   const [fullName, setFullName] = useState("");
   const [time, setTime] = useState("");
-  console.log(fullName);
-  console.log(time);
 
   const createAttendance = async (e) => {
     e.preventDefault();
@@ -16,24 +14,21 @@ export default function AttendanceCard() {
         time: time,
       });
 
-      toast.success("Attendance create successfully");
+      toast.success("Attendance created successfully");
       setFullName("");
       setTime("");
-      fetchAllAllattendance()
+      fetchAllAllattendance();
     } catch (error) {
       console.log("something went wrong", error);
       toast.error("Failed to take your attendance");
     }
   };
 
-  // FETCHED ALL ATTENTION
-
   const [attendance, setAttendance] = useState(null);
 
   const fetchAllAllattendance = async () => {
     try {
       const res = await axios.get("https://ams-3jwl.onrender.com/get-all-attendance");
-      console.log(res.data.data);
       setAttendance(res.data.data);
     } catch (error) {
       console.log("something went wrong", error);
@@ -41,35 +36,34 @@ export default function AttendanceCard() {
     }
   };
 
-  
-
   useEffect(() => {
     fetchAllAllattendance();
   }, []);
 
   const deleteAttendance = async (_id) => {
-    // console.log(_id)
     try {
-      const res = await axios.delete(`https://ams-3jwl.onrender.com/delele-single-attendance/${_id}`)
-      toast.success("Delete successfully")
-      fetchAllAllattendance()
+      await axios.delete(`https://ams-3jwl.onrender.com/delele-single-attendance/${_id}`);
+      toast.success("Deleted successfully");
+      fetchAllAllattendance();
     } catch (error) {
-      console.log("something went wrong")
-      toast.error("Delete Failed")
+      console.log("something went wrong");
+      toast.error("Delete failed");
     }
   };
 
   return (
-    <div>
-
-    {/* // attendancecreate form */}
+    <div className="max-w-4xl mx-auto p-6 space-y-8">
+      {/* Attendance Form */}
       <form
         onSubmit={createAttendance}
-        className="w-4/12 border border-gray-200 p-8 space-y-2 mx-auto shadow-xl"
+        className="bg-white border border-gray-200 p-6 rounded-xl shadow-md space-y-4"
       >
-        {/* <p>{fullName} {time}</p> for the check */}
-        <div className="flex flex-col">
-          <label htmlFor="Full Name">Full Name</label>
+        <h2 className="text-xl font-semibold text-gray-800">Create Attendance</h2>
+
+        <div className="flex flex-col space-y-1">
+          <label htmlFor="Full Name" className="text-sm font-medium text-gray-700">
+            Full Name
+          </label>
           <input
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
@@ -77,12 +71,14 @@ export default function AttendanceCard() {
             type="text"
             id="Full Name"
             placeholder="Enter your full name"
-            className="border border-gray-200 outline-0 px-2"
+            className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
           />
         </div>
 
-        <div className="flex flex-col">
-          <label htmlFor="Time">Time</label>
+        <div className="flex flex-col space-y-1">
+          <label htmlFor="Time" className="text-sm font-medium text-gray-700">
+            Time
+          </label>
           <input
             value={time}
             onChange={(e) => setTime(e.target.value)}
@@ -90,40 +86,49 @@ export default function AttendanceCard() {
             type="text"
             id="Time"
             placeholder="Enter your entry time"
-            className="border border-gray-200 outline-0 px-2"
+            className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
           />
         </div>
 
         <div className="flex justify-end">
           <button
             type="submit"
-            className="bg-violet-600 text-white py-1.5 px-6 rounded-md "
+            className="bg-violet-600 hover:bg-violet-700 text-white py-2 px-5 rounded-md text-sm transition"
           >
-            Create Attendance
+            Submit
           </button>
         </div>
       </form>
 
-      {/* attendance table */}
+      {/* Attendance List */}
+      <div className="bg-white border border-gray-200 rounded-xl shadow-md p-6">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">Attendance Records</h2>
 
-     
+        {attendance?.length === 0 && (
+          <p className="text-sm text-gray-500">No attendance records found.</p>
+        )}
 
-        {
-          attendance?.map((eachAttendance, index)=>(
-            <div key={index} className="flex items-center gap-4 mb-4">
-
-            <p>{index + 1 }</p>
-            <p>{eachAttendance.fullName}</p>
-            <p>{eachAttendance.time}</p>
-            <p>{eachAttendance._id}</p>
-            <button onClick={()=>deleteAttendance(eachAttendance._id)} className="text-white bg-red-500 text-sm px-4 py-1 rounded-md">Delete</button>
-           
-          </div>
-          ))
-        }
-
-
-
+        <div className="space-y-4">
+          {attendance?.map((eachAttendance, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-between bg-gray-50 border rounded-md px-4 py-3"
+            >
+              <div className="flex items-center gap-4">
+                <span className="text-sm font-semibold text-gray-700">{index + 1}.</span>
+                <span className="text-sm text-gray-800">{eachAttendance.fullName}</span>
+                <span className="text-sm text-gray-500">{eachAttendance.time}</span>
+              </div>
+              <button
+                onClick={() => deleteAttendance(eachAttendance._id)}
+                className="bg-red-500 hover:bg-red-600 text-white text-xs px-4 py-1.5 rounded-md transition"
+              >
+                Delete
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
